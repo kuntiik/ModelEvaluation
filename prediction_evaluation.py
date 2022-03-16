@@ -48,6 +48,30 @@ class PredictionEval:
         ]
         return queries
 
+    def get_latex_table(self):
+        queries = [
+            {"ap": 1},
+            {"ap": 1, "iouThr": 0.3, "areaRng": "all", "maxDets": 100},
+            {"ap": 1, "iouThr": 0.5, "areaRng": "all", "maxDets": 100},
+            {"ap": 1, "iouThr": 0.75, "areaRng": "all", "maxDets": 100},
+            {"ap": 1, "iouThr": 0.5, "areaRng": "small", "maxDets": 100},
+            {"ap": 1, "iouThr": 0.5, "areaRng": "medium", "maxDets": 100},
+            {"ap": 1, "iouThr": 0.5, "areaRng": "large", "maxDets": 100},
+        ]
+        val_results = self.evaluate_map(queries, stage="val")
+        train_results = self.evaluate_map(queries, stage="train")
+
+        val_results = [round(res, 3) for res in val_results]
+        train_results = [round(res, 3) for res in train_results]
+
+        text = f"""stage  & AP & AP@.3 & AP@.5 & AP@.75 & AP@.5_S & AP@.5_M & AP@.5_L \\ \hline
+        training & {train_results[0]}& {train_results[1]} & {train_results[2]} & {train_results[3]} 
+        & {train_results[4]} & {train_results[5]} & {train_results[6]}
+        validation & {val_results[0]}& {val_results[1]} & {val_results[2]} & {val_results[3]} 
+        & {val_results[4]} & {val_results[5]} & {val_results[6]}
+        """
+        return text
+
     def indices_by_stage(self, stage):
         evaluate_imgs = []
         if stage == "val":
